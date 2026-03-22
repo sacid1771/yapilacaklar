@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="Görevler" />
+<meta name="theme-color" content="#0e0e0e" />
+<title>Görevler</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  :root {
+    --bg: #0e0e0e;
+    --surface: #171717;
+    --surface2: #1e1e1e;
+    --border: rgba(255,255,255,0.07);
+    --border2: rgba(255,255,255,0.12);
+    --text: #f0f0f0;
+    --muted: #666;
+    --muted2: #444;
+    --accent: #e8e8e8;
+    --red: #ff4d4d;
+    --amber: #f0a500;
+    --green: #3ecf8e;
+    --red-dim: rgba(255,77,77,0.12);
+    --amber-dim: rgba(240,165,0,0.12);
+    --green-dim: rgba(62,207,142,0.10);
+  }
+
+  html, body {
+    height: 100%;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    overscroll-behavior: none;
+  }
+
+  .app {
+    max-width: 430px;
+    margin: 0 auto;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    padding-bottom: env(safe-area-inset-bottom, 20px);
+  }
+
+  /* Header */
+  .header {
+    padding: 56px 24px 20px;
+  }
+  .header-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 28px;
+  }
+  .logo {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+  .date-chip {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 5px 12px;
+    border-radius: 99px;
+  }
+  .header-title {
+    font-size: 30px;
+    font-weight: 300;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+  .header-count {
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 400;
+  }
+
+  /* Tabs */
+  .tabs {
+    display: flex;
+    padding: 0 24px;
+    gap: 4px;
+    margin-bottom: 20px;
+  }
+  .tab {
+    flex: 1;
+    padding: 9px 0;
+    border-radius: 10px;
+    border: 1px solid transparent;
+    background: transparent;
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 500;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+  }
+  .tab.active {
+    background: var(--surface);
+    border-color: var(--border2);
+    color: var(--text);
+  }
+
+  /* Add form */
+  .add-area {
+    padding: 0 24px 20px;
+  }
+  .add-field {
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    border-radius: 14px;
+    padding: 14px 16px;
+    margin-bottom: 8px;
+  }
+  .add-field label {
+    display: block;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+  .add-field input {
+    width: 100%;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 400;
+    padding: 0;
+  }
+  .add-field input::placeholder { color: var(--muted2); }
+  .add-field input[type="date"] {
+    color-scheme: dark;
+    color: var(--text);
+    font-size: 15px;
+  }
+  .add-btn {
+    width: 100%;
+    height: 44px;
+    border-radius: 14px;
+    border: none;
+    background: var(--text);
+    color: var(--bg);
+    font-size: 15px;
+    font-weight: 500;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.15s, transform 0.1s;
+    margin-top: 4px;
+  }
+  .add-btn:active { transform: scale(0.98); opacity: 0.8; }
+
+  /* Task list */
+  .list-area {
+    flex: 1;
+    padding: 0 24px;
+    overflow-y: auto;
+  }
+
+  .task-group-label {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    margin-top: 8px;
+  }
+
+  .task-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 14px 16px;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    transition: border-color 0.2s, background 0.2s;
+    animation: slideIn 0.2s ease;
+  }
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .task-card.urgent { border-left: 2px solid var(--red); }
+  .task-card.soon   { border-left: 2px solid var(--amber); }
+  .task-card.ok     { border-left: 2px solid var(--green); }
+
+  .check-btn {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 1.5px solid var(--border2);
+    background: transparent;
+    cursor: pointer;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+  }
+  .check-btn:active { transform: scale(0.88); }
+  .task-card.urgent .check-btn { border-color: rgba(255,77,77,0.4); }
+  .task-card.soon .check-btn   { border-color: rgba(240,165,0,0.4); }
+  .task-card.ok .check-btn     { border-color: rgba(62,207,142,0.4); }
+
+  .task-info { flex: 1; min-width: 0; }
+  .task-name {
+    font-size: 15px;
+    font-weight: 400;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 4px;
+  }
+  .task-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .task-date {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+  }
+  .badge {
+    font-size: 10px;
+    font-weight: 500;
+    padding: 2px 8px;
+    border-radius: 99px;
+    letter-spacing: 0.03em;
+  }
+  .badge-urgent { background: var(--red-dim); color: var(--red); }
+  .badge-soon   { background: var(--amber-dim); color: var(--amber); }
+  .badge-ok     { background: var(--green-dim); color: var(--green); }
+
+  .del-btn {
+    background: transparent;
+    border: none;
+    color: var(--muted2);
+    cursor: pointer;
+    font-size: 18px;
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+    flex-shrink: 0;
+  }
+  .del-btn:active { background: var(--red-dim); color: var(--red); }
+
+  /* Done list */
+  .done-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 14px 16px;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    opacity: 0.55;
+    animation: slideIn 0.2s ease;
+  }
+  .done-check {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--green-dim);
+    border: 1.5px solid rgba(62,207,142,0.3);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--green);
+    font-size: 12px;
+  }
+  .done-name {
+    flex: 1;
+    font-size: 14px;
+    color: var(--muted);
+    text-decoration: line-through;
+    text-decoration-color: var(--muted2);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .done-date {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--muted2);
+    white-space: nowrap;
+  }
+  .undo-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 11px;
+    font-family: 'DM Sans', sans-serif;
+    padding: 4px 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.15s;
+  }
+  .undo-btn:active { background: var(--surface2); }
+
+  .empty {
+    text-align: center;
+    padding: 48px 0;
+    color: var(--muted2);
+    font-size: 14px;
+    font-weight: 300;
+  }
+  .empty-icon {
+    font-size: 32px;
+    margin-bottom: 12px;
+    opacity: 0.4;
+  }
+
+  /* Divider */
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 4px 0 16px;
+  }
+
+  /* Overdue group */
+  .task-group-label.red { color: var(--red); opacity: 0.7; }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="header">
+    <div class="header-top">
+      <span class="logo">Görevler</span>
+      <span class="date-chip" id="date-chip"></span>
+    </div>
+    <div class="header-title" id="header-title">Bugün</div>
+    <div class="header-count" id="header-count"></div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('active')">Yapılacaklar</button>
+    <button class="tab" onclick="switchTab('done')">Tamamlananlar</button>
+  </div>
+
+  <div class="add-area" id="add-area">
+    <div class="add-field">
+      <label>Görev</label>
+      <input type="text" id="inp-name" placeholder="Ne yapılacak?" />
+    </div>
+    <div class="add-field">
+      <label>Son tarih</label>
+      <input type="date" id="inp-date" />
+    </div>
+    <button class="add-btn" onclick="addTask()">Ekle</button>
+  </div>
+
+  <div class="list-area" id="list-area"></div>
+</div>
+
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getFirestore, collection, onSnapshot, addDoc, deleteDoc, doc, updateDoc, serverTimestamp, query, orderBy } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCvFjhRHyfl-qpt2QaBB9mMqL6cnc2lXP0",
+  authDomain: "yapilacaklar-6b488.firebaseapp.com",
+  projectId: "yapilacaklar-6b488",
+  storageBucket: "yapilacaklar-6b488.firebasestorage.app",
+  messagingSenderId: "622014000764",
+  appId: "1:622014000764:web:2f027fb83dc2aa1db5e3f9"
+};
+
+const app = initializeApp(firebaseConfig);
+const firestore = getFirestore(app);
+
+const tasksCol = collection(firestore, 'tasks');
+const doneCol = collection(firestore, 'done');
+
+let tasks = [];
+let done = [];
+
+const today = new Date();
+today.setHours(0,0,0,0);
+
+function daysLeft(dateStr) {
+  const d = new Date(dateStr); d.setHours(0,0,0,0);
+  return Math.round((d - today) / 86400000);
+}
+function urgency(days) {
+  if (days <= 3) return 'urgent';
+  if (days <= 7) return 'soon';
+  return 'ok';
+}
+function badgeLabel(days) {
+  if (days < 0) return `${Math.abs(days)}g gecikti`;
+  if (days === 0) return 'Bugün';
+  if (days === 1) return 'Yarın';
+  return `${days}g kaldı`;
+}
+function fmtDateLong(str) {
+  const d = new Date(str);
+  return d.toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' });
+}
+function fmtDatetime(ts) {
+  if (!ts) return '';
+  const d = ts.toDate ? ts.toDate() : new Date(ts);
+  return d.toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+}
+
+const dateChip = document.getElementById('date-chip');
+dateChip.textContent = today.toLocaleDateString('tr-TR', { weekday: 'short', day: 'numeric', month: 'short' });
+
+let currentTab = 'active';
+
+window.switchTab = function(tab) {
+  currentTab = tab;
+  document.querySelectorAll('.tab').forEach((el, i) => {
+    el.classList.toggle('active', (tab === 'active' && i === 0) || (tab === 'done' && i === 1));
+  });
+  document.getElementById('add-area').style.display = tab === 'active' ? '' : 'none';
+  render();
+};
+
+function render() {
+  const area = document.getElementById('list-area');
+  const titleEl = document.getElementById('header-title');
+  const countEl = document.getElementById('header-count');
+
+  if (currentTab === 'active') {
+    const sorted = [...tasks].sort((a, b) => daysLeft(a.date) - daysLeft(b.date));
+    const overdue = sorted.filter(t => daysLeft(t.date) < 0);
+    const upcoming = sorted.filter(t => daysLeft(t.date) >= 0);
+
+    titleEl.textContent = 'Yapılacaklar';
+    countEl.textContent = tasks.length === 0 ? 'Hiç görev yok' : `${tasks.length} görev`;
+
+    if (sorted.length === 0) {
+      area.innerHTML = `<div class="empty"><div class="empty-icon">○</div>Görev yok</div>`;
+      return;
+    }
+    let html = '';
+    if (overdue.length) {
+      html += `<div class="task-group-label red">Gecikmiş</div>`;
+      html += overdue.map(taskHTML).join('');
+      if (upcoming.length) html += `<div class="divider"></div>`;
+    }
+    if (upcoming.length) {
+      if (overdue.length) html += `<div class="task-group-label">Yaklaşan</div>`;
+      html += upcoming.map(taskHTML).join('');
+    }
+    area.innerHTML = html;
+  } else {
+    const sorted = [...done].sort((a, b) => {
+      const at = a.completedAt?.toMillis ? a.completedAt.toMillis() : 0;
+      const bt = b.completedAt?.toMillis ? b.completedAt.toMillis() : 0;
+      return bt - at;
+    });
+    titleEl.textContent = 'Tamamlananlar';
+    countEl.textContent = done.length === 0 ? 'Henüz yok' : `${done.length} görev tamamlandı`;
+    if (sorted.length === 0) {
+      area.innerHTML = `<div class="empty"><div class="empty-icon">✓</div>Henüz tamamlanan yok</div>`;
+      return;
+    }
+    area.innerHTML = sorted.map(doneHTML).join('');
+  }
+}
+
+function taskHTML(t) {
+  const days = daysLeft(t.date);
+  const u = urgency(days);
+  return `<div class="task-card ${u}">
+    <button class="check-btn" onclick="completeTask('${t.id}')"></button>
+    <div class="task-info">
+      <div class="task-name">${t.name}</div>
+      <div class="task-meta">
+        <span class="task-date">${fmtDateLong(t.date)}</span>
+        <span class="badge badge-${u}">${badgeLabel(days)}</span>
+      </div>
+    </div>
+    <button class="del-btn" onclick="deleteTask('${t.id}')">×</button>
+  </div>`;
+}
+
+function doneHTML(t) {
+  return `<div class="done-card">
+    <div class="done-check">✓</div>
+    <div class="done-name">${t.name}</div>
+    <div class="done-date">${fmtDatetime(t.completedAt)}</div>
+    <button class="undo-btn" onclick="undoTask('${t.id}')">geri al</button>
+  </div>`;
+}
+
+window.addTask = async function() {
+  const name = document.getElementById('inp-name').value.trim();
+  const date = document.getElementById('inp-date').value;
+  if (!name || !date) return;
+  await addDoc(tasksCol, { name, date, createdAt: serverTimestamp() });
+  document.getElementById('inp-name').value = '';
+  document.getElementById('inp-date').value = '';
+};
+
+window.deleteTask = async function(id) {
+  await deleteDoc(doc(firestore, 'tasks', id));
+};
+
+window.completeTask = async function(id) {
+  const t = tasks.find(t => t.id === id);
+  if (!t) return;
+  await addDoc(doneCol, { name: t.name, date: t.date, completedAt: serverTimestamp() });
+  await deleteDoc(doc(firestore, 'tasks', id));
+};
+
+window.undoTask = async function(id) {
+  const t = done.find(t => t.id === id);
+  if (!t) return;
+  await addDoc(tasksCol, { name: t.name, date: t.date, createdAt: serverTimestamp() });
+  await deleteDoc(doc(firestore, 'done', id));
+};
+
+onSnapshot(tasksCol, snap => {
+  tasks = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  render();
+});
+
+onSnapshot(doneCol, snap => {
+  done = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  render();
+});
+
+document.getElementById('inp-name').addEventListener('keydown', e => { if (e.key === 'Enter') addTask(); });
+</script>
+</body>
+</html>
